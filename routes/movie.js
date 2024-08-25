@@ -44,6 +44,13 @@ const movies = [
   },
 ];
 
+const logger = (req, res, next) => {
+  console.log(`${req.method} received on URL ${req.url}`);
+  next();
+};
+
+router.use(logger);
+
 router.get("/", (req, res) => {
   res.send(movies);
 });
