@@ -1,4 +1,5 @@
 const express = require("express");
+const jwt = require("jsonwebtoken");
 const router = express.Router();
 
 const Movie = require("../models/movie");
@@ -8,7 +9,21 @@ const logger = (req, res, next) => {
   next();
 };
 
+const validateJWT = (req, res, next) => {
+  const headers = req.headers;
+  const token = headers.authorization;
+  const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+  console.log({ decodedToken });
+  if (decodedToken.email) {
+    req.user = decodedToken;
+    next();
+  } else {
+    res.status(401).send("Unauthorized");
+  }
+};
+
 router.use(logger);
+router.use(validateJWT);
 
 router.get("/", async (req, res) => {
   const movies = await Movie.find();
@@ -22,6 +37,9 @@ router.get("/:id", async (req, res) => {
 });
 
 router.post("/", async (req, res) => {
+  if (req.user.role !== "ADMIN") {
+    return res.status(403).send("Forbidden");
+  }
   const dbMovie = await Movie.create(req.body);
   res.send(dbMovie);
 });

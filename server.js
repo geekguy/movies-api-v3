@@ -12,6 +12,7 @@ mongoose.connect(process.env.MONGO_URL).then(() => {
 });
 
 const movieRouter = require("./routes/movie");
+const userRouter = require("./routes/user");
 
 app.use(express.json());
 
@@ -24,3 +25,4 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/movies", movieRouter);
+app.use("/api/users", userRouter);
